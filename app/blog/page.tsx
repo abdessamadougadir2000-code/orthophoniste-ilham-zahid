@@ -1,56 +1,65 @@
-import { createClient } from "next-sanity";
-import Link from "next/link";
+"use client";
 
-// 1. الربط مع Sanity (نفس الـ ID ديالك)
-const client = createClient({
-  projectId: "brkysa43",
-  dataset: "production",
-  apiVersion: "2024-04-04",
-  useCdn: false,
-});
+import React from 'react';
 
-export default async function BlogPage() {
-  // 2. جلب المقالات
-  const posts = await client.fetch(`*[_type == "post"] | order(_createdAt desc)`);
+export default function BlogPage() {
+  const blogHtml = String.raw`
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog - Conseils en Orthophonie | Ilham Zahid</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --primary: #0c6e5f; --dark: #1a2332; --text: #2d3748; --bg: #f8fafb; }
+  body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); color: var(--text); }
+  .navbar { background: #fff; padding: 0 5%; height: 68px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top:0; z-index:100; }
+  .nav-brand { font-weight: 700; color: var(--dark); text-decoration: none; }
+  .container { max-width: 800px; margin: 60px auto; padding: 0 20px; }
+  .btn-back { color: var(--primary); text-decoration: none; font-weight: 600; display: inline-block; margin-bottom: 30px; }
+  h1 { font-size: 2.5rem; color: var(--dark); margin-bottom: 40px; }
+  
+  .article-link { text-decoration: none; color: inherit; display: block; margin-bottom: 25px; }
+  .card { background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); transition: transform 0.3s; }
+  .article-link:hover .card { transform: translateY(-5px); }
+  
+  .date { color: var(--primary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
+  h2 { margin: 10px 0; font-size: 1.4rem; color: var(--dark); }
+  p { color: #64748b; line-height: 1.6; }
+</style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="nav-brand">Ilham Zahid — Orthophoniste</a>
+    <a href="/" style="text-decoration:none; color:var(--primary); font-weight:600;">Accueil</a>
+  </nav>
+
+  <div class="container">
+    <a href="/" class="btn-back">← Retour à l'accueil</a>
+    <h1>Articles & Conseils</h1>
+
+    <a href="/article/depistage-precoce" class="article-link">
+      <article class="card">
+        <span class="date">5 Avril 2026</span>
+        <h2>L'importance du dépistage précoce</h2>
+        <p>Découvrez pourquoi une intervention rapide peut faire toute la différence dans le développement du langage chez l'enfant...</p>
+      </article>
+    </a>
+
+    <a href="/article/conseils-begaiement" class="article-link">
+      <article class="card">
+        <span class="date">28 Mars 2026</span>
+        <h2>Conseils pour le bégaiement</h2>
+        <p>Comment accompagner son enfant au quotidien ? Voici quelques pistes pour favoriser une communication sereine à la maison.</p>
+      </article>
+    </a>
+  </div>
+</body>
+</html>
+  `;
 
   return (
-    <main style={{ padding: '40px 5%', fontFamily: 'sans-serif', backgroundColor: '#f8fafb', minHeight: '100vh' }}>
-      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-        
-        {/* زر العودة للسيت الأصلي */}
-        <Link href="/" style={{ color: '#0c6e5f', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.9rem' }}>
-          ← RETOUR AU SITE OFFICIEL
-        </Link>
-
-        <div style={{ marginTop: '30px', marginBottom: '50px' }}>
-          <h1 style={{ fontSize: '2.8rem', color: '#1a2332', marginBottom: '10px' }}>
-            Blog de <span style={{ color: '#0c6e5f' }}>l'Orthophoniste</span>
-          </h1>
-          <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Conseils, articles et informations sur l'orthophonie à Agadir.</p>
-        </div>
-
-        {/* عرض المقالات */}
-        <div style={{ display: 'grid', gap: '20px' }}>
-          {posts.map((post: any) => (
-            <Link href={`/article/${post._id}`} key={post._id} style={{ textDecoration: 'none' }}>
-              <div style={{ 
-                padding: '30px', 
-                backgroundColor: '#fff', 
-                borderRadius: '16px', 
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.02)',
-                transition: 'transform 0.2s ease-in-out'
-              }}>
-                <h2 style={{ color: '#1a2332', margin: '0 0 12px 0', fontSize: '1.4rem' }}>{post.title}</h2>
-                <div style={{ color: '#0c6e5f', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  Lire l'article كامل <span>→</span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-      </div>
-    </main>
+    <div dangerouslySetInnerHTML={{ __html: blogHtml }} />
   );
 }
