@@ -8,6 +8,17 @@ export default {
       title: 'Titre de l\'article',
       type: 'string',
     },
+    // --- هادا هو الكود اللي غاتزيد دابا ---
+    {
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      options: {
+        source: 'title', 
+        maxLength: 96,
+      },
+    },
+    // ------------------------------------
     {
       name: 'mainImage',
       title: 'Image principale',
