@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { createClient } from "next-sanity";
 
-// --- إعدادات Sanity ---
+// حطينا الرقم ديريكت هنا باش نتفاداو المشكل ديال Vercel
 const client = createClient({
-  projectId: "77k3g7b4",
+  projectId: "77k3g7b4", 
   dataset: "production",
   apiVersion: "2023-05-03",
-  useCdn: false, // false باش يقرأ الداتا الجديدة مباشرة
+  useCdn: false,
 });
 
 export default function BlogPage() {
@@ -18,7 +18,7 @@ export default function BlogPage() {
   useEffect(() => {
     async function fetchArticles() {
       try {
-        // كنقلبو على أي حاجة نوعها article أو post باش نضمنو ظهور مقالك
+        // كنجبدو أي حاجة نوعها article أو post
         const query = `*[_type in ["article", "post"]] | order(_createdAt desc) {
           title,
           "slug": slug.current,
@@ -36,8 +36,7 @@ export default function BlogPage() {
   }, []);
 
   return (
-    <div style={{ fontFamily: "'Inter', sans-serif", background: "#f8fafb", minHeight: "100vh", paddingBottom: "50px" }}>
-      {/* Navbar */}
+    <div style={{ fontFamily: "sans-serif", background: "#f8fafb", minHeight: "100vh", paddingBottom: "50px" }}>
       <nav style={{ background: "#fff", padding: "15px 5%", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
         <a href="/" style={{ fontWeight: 800, textDecoration: 'none', color: '#1a2332', fontSize: "1.2rem" }}>Ilham Zahid</a>
         <a href="/" style={{ color: "#0c6e5f", textDecoration: "none", fontWeight: 600 }}>Accueil</a>
@@ -47,46 +46,23 @@ export default function BlogPage() {
         <h1 style={{ fontSize: "2.5rem", color: "#1a2332", marginBottom: "30px" }}>Articles & Conseils</h1>
         
         {loading ? (
-          <div style={{ textAlign: "center", padding: "50px" }}>
-            <p>Chargement des articles...</p>
-          </div>
+          <p style={{ textAlign: "center" }}>Chargement des articles...</p>
         ) : (
           <div style={{ display: "grid", gap: "20px" }}>
             {articles.map((article) => (
-              <a 
-                key={article.slug} 
-                href={`/article/${article.slug}`} 
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <div style={{ 
-                  background: "#fff", 
-                  padding: "25px", 
-                  borderRadius: "15px", 
-                  boxShadow: "0 4px 15px rgba(0,0,0,0.05)", 
-                  borderLeft: "6px solid #0c6e5f",
-                  transition: "transform 0.2s"
-                }}>
-                  <span style={{ color: "#0c6e5f", fontSize: "0.85rem", fontWeight: 700 }}>
-                    {new Date(article._createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                  </span>
-                  <h2 style={{ margin: "10px 0", fontSize: "1.5rem", color: "#1a2332" }}>{article.title}</h2>
+              <a key={article.slug} href={`/article/${article.slug}`} style={{ textDecoration: "none", color: "inherit" }}>
+                <div style={{ background: "#fff", padding: "25px", borderRadius: "15px", boxShadow: "0 4px 15px rgba(0,0,0,0.05)", borderLeft: "6px solid #0c6e5f" }}>
+                  <small style={{ color: "#0c6e5f", fontWeight: "bold" }}>
+                    {new Date(article._createdAt).toLocaleDateString('fr-FR')}
+                  </small>
+                  <h2 style={{ margin: "10px 0", fontSize: "1.5rem" }}>{article.title}</h2>
                   <p style={{ color: "#718096", margin: 0 }}>Cliquer pour lire la suite...</p>
                 </div>
               </a>
             ))}
-
-            {articles.length === 0 && (
-              <div style={{ textAlign: "center", padding: "40px", background: "#fff", borderRadius: "15px" }}>
-                <p style={{ color: "#718096", fontSize: "1.1rem" }}>⚠️ Aucun article trouvé dans Sanity.</p>
-                <p style={{ fontSize: "0.9rem" }}>تأكد بلي درتي <strong>Publish</strong> للمقال فـ Sanity Studio.</p>
-              </div>
-            )}
+            {articles.length === 0 && <p style={{ textAlign: "center", color: "#718096" }}>Aucun article trouvé.</p>}
           </div>
         )}
-
-        <div style={{ marginTop: "40px", textAlign: "center" }}>
-          <a href="/" style={{ color: "#0c6e5f", textDecoration: "none", fontWeight: 600 }}>← Retour à l'accueil</a>
-        </div>
       </div>
     </div>
   );

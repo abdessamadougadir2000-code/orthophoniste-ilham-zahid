@@ -1,81 +1,58 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { createClient } from "next-sanity";
+import { PortableText } from "@portabletext/react";
+import imageUrlBuilder from '@sanity/image-url';
 
-// إعدادات الاتصال بـ Sanity ديالك
 const client = createClient({
-  projectId: "77k3g7b4",
+  projectId: "77k3g7b4", // نفس الرقم هنا
   dataset: "production",
   apiVersion: "2023-05-03",
   useCdn: false,
 });
 
-export default function BlogPage() {
-  const [articles, setArticles] = useState<any[]>([]);
+const builder = imageUrlBuilder(client);
+function urlFor(source: any) { return builder.image(source); }
+
+export default function ArticlePage() {
+  const params = useParams();
+  const slug = params?.slug;
+  const [article, setArticle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // كنجبدو العناوين، الـ Slug، والتاريخ من Sanity
-    const query = `*[_type == "article"] | order(_createdAt desc) {
-      title,
-      "slug": slug.current,
-      _createdAt
-    }`;
+    async function fetchData() {
+      if (!slug) return;
+      try {
+        const query = `*[_type in ["article", "post"] && slug.current == $slug][0]{ title, body, mainImage }`;
+        const data = await client.fetch(query, { slug });
+        setArticle(data);
+      } catch (err) { console.error(err); } finally { setLoading(false); }
+    }
+    fetchData();
+  }, [slug]);
 
-    client.fetch(query)
-      .then((data) => {
-        setArticles(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
+  if (loading) return <div style={{ textAlign: "center", padding: "100px" }}>Chargement...</div>;
+  if (!article) return <div style={{ textAlign: "center", padding: "100px" }}>⚠️ المقال غير موجود</div>;
 
   return (
-    <div style={{ padding: "80px 5%", maxWidth: "1000px", margin: "0 auto", fontFamily: "sans-serif" }}>
-      <h1 style={{ fontSize: "2.5rem", color: "#1a2332", marginBottom: "40px", textAlign: "center" }}>
-        Articles & Conseils
-      </h1>
+    <div style={{ background: "#f8fafb", minHeight: "100vh", paddingBottom: "50px" }}>
+      <nav style={{ background: "#fff", padding: "15px 5%", display: "flex", justifyContent: "space-between", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
+        <a href="/" style={{ fontWeight: 800, textDecoration: 'none', color: '#1a2332' }}>Ilham Zahid</a>
+      </nav>
 
-      {loading ? (
-        <p style={{ textAlign: "center" }}>Chargement des articles...</p>
-      ) : (
-        <div style={{ display: "grid", gap: "30px" }}>
-          {articles.map((article) => (
-            <a 
-              key={article.slug} 
-              href={`/article/${article.slug}`}
-              style={{ 
-                display: "block", 
-                padding: "30px", 
-                background: "#fff", 
-                borderRadius: "20px", 
-                textDecoration: "none", 
-                boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                borderLeft: "6px solid #0c6e5f",
-                transition: "transform 0.2s"
-              }}
-            >
-              <span style={{ color: "#0c6e5f", fontWeight: "bold", fontSize: "0.9rem" }}>
-                {new Date(article._createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-              </span>
-              <h2 style={{ color: "#1a2332", margin: "15px 0", fontSize: "1.6rem" }}>{article.title}</h2>
-              <p style={{ color: "#718096" }}>Cliquer pour lire l'article complet...</p>
-            </a>
-          ))}
-
-          {articles.length === 0 && (
-            <p style={{ textAlign: "center", color: "#718096" }}>Aucun article trouvé.</p>
-          )}
+      <article style={{ maxWidth: "800px", margin: "40px auto", padding: "40px", background: "#fff", borderRadius: "20px", boxShadow: "0 10px 30px rgba(0,0,0,0.04)" }}>
+        <a href="/blog" style={{ color: "#0c6e5f", textDecoration: "none", fontWeight: 600 }}>← Retour au Blog</a>
+        {article.mainImage && (
+          <img src={urlFor(article.mainImage).url()} style={{ width: "100%", borderRadius: "15px", margin: "30px 0" }} alt="" />
+        )}
+        <h1 style={{ fontSize: "2.5rem", color: "#1a2332" }}>{article.title}</h1>
+        <div style={{ lineHeight: "1.8", color: "#2d3748", fontSize: "1.1rem" }}>
+          <PortableText value={article.body} />
         </div>
-      )}
-      
-      <div style={{ textAlign: "center", marginTop: "40px" }}>
-        <a href="/" style={{ color: "#0c6e5f", fontWeight: "600", textDecoration: "none" }}>← Retour à l'accueil</a>
-      </div>
+      </article>
     </div>
   );
 }
