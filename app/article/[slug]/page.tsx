@@ -1,92 +1,38 @@
 "use client";
-
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
 import { createClient } from "next-sanity";
-import { PortableText } from "@portabletext/react";
-import imageUrlBuilder from '@sanity/image-url';
 
-// --- الإعدادات الصحيحة بـ Project ID الجديد ديالك ---
 const client = createClient({
-  projectId: "77k3g7b4", 
+  projectId: "77k3g7b4",
   dataset: "production",
-  apiVersion: "2023-05-03", 
-  useCdn: false, // خليناها false باش يبان التغيير دابا بلا تعطال
+  apiVersion: "2023-05-03",
+  useCdn: false,
 });
 
-const builder = imageUrlBuilder(client);
-function urlFor(source: any) {
-  return builder.image(source);
-}
-
-export default function ArticlePage() {
-  const params = useParams();
-  const slug = params?.slug;
-  const [article, setArticle] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+export default function BlogPage() {
+  const [posts, setPosts] = useState<any[]>([]);
 
   useEffect(() => {
-    async function fetchData() {
-      if (!slug) return;
-      try {
-        // هنا بدلنا _type لـ "article" باش يطابق Sanity Studio عندك
-        const query = `*[_type == "article" && slug.current == $slug][0]{ 
-          title, 
-          body,
-          mainImage 
-        }`;
-        const data = await client.fetch(query, { slug });
-        setArticle(data);
-      } catch (err) { 
-        console.error("Sanity Error:", err); 
-      } finally { 
-        setLoading(false); 
-      }
-    }
-    fetchData();
-  }, [slug]);
-
-  if (loading) return (
-    <div style={{ padding: "100px", textAlign: "center", fontFamily: "sans-serif", color: "#0c6e5f" }}>
-      <h2>Chargement de l'article...</h2>
-    </div>
-  );
-
-  if (!article) return (
-    <div style={{ padding: "100px", textAlign: "center", fontFamily: "sans-serif" }}>
-      <h2 style={{ color: "#e53e3e" }}>⚠️ المقال غير موجود</h2>
-      <p>Slug recherché : <strong>{slug}</strong></p>
-      <p style={{ color: "#718096" }}>تأكد بلي الـ Slug فـ Sanity هو بـ الضبط هاد الكلمة لّي فوق.</p>
-      <a href="/" style={{ color: "#0c6e5f", fontWeight: "bold" }}>الرجوع للرئيسية</a>
-    </div>
-  );
+    // كنجبدو كاع المقالات من نوع article
+    client.fetch(`*[_type == "article"]{ title, slug, "date": _createdAt }`)
+      .then(data => setPosts(data));
+  }, []);
 
   return (
-    <div style={{ background: "#f8fafb", minHeight: "100vh", paddingBottom: "50px" }}>
-      <nav style={{ background: "#fff", padding: "15px 5%", boxShadow: "0 2px 10px rgba(0,0,0,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <a href="/" style={{ fontWeight: 800, textDecoration: 'none', color: '#1a2332', fontSize: "1.2rem" }}>Ilham Zahid</a>
-        <span style={{ color: "#0c6e5f", fontWeight: 600 }}>Orthophoniste</span>
-      </nav>
-
-      <article style={{ maxWidth: "850px", margin: "40px auto", padding: "40px", background: "#fff", borderRadius: "25px", boxShadow: "0 10px 30px rgba(0,0,0,0.04)" }}>
-        <a href="/" style={{ color: "#0c6e5f", textDecoration: "none", fontWeight: 600, display: "block", marginBottom: "20px" }}>← Retour</a>
-        
-        {article.mainImage && (
-          <img 
-            src={urlFor(article.mainImage).url()} 
-            alt={article.title}
-            style={{ width: "100%", height: "450px", objectFit: "cover", borderRadius: "20px", marginBottom: "30px" }}
-          />
-        )}
-
-        <h1 style={{ fontSize: "2.8rem", color: "#1a2332", marginBottom: "25px", lineHeight: "1.2", fontWeight: 800 }}>
-          {article.title}
-        </h1>
-        
-        <div style={{ lineHeight: "1.8", color: "#2d3748", fontSize: "1.2rem", fontFamily: "Georgia, serif" }}>
-          <PortableText value={article.body} />
-        </div>
-      </article>
+    <div style={{ padding: "50px 5%" }}>
+      <h1>Articles & Conseils</h1>
+      <div style={{ display: "grid", gap: "20px" }}>
+        {posts.map((post) => (
+          <a key={post.slug.current} href={`/article/${post.slug.current}`} style={{ 
+            padding: "20px", background: "#fff", borderRadius: "15px", display: "block", textDecoration: "none", color: "inherit", boxShadow: "0 4px 10px rgba(0,0,0,0.05)" 
+          }}>
+            <small style={{ color: "#0c6e5f" }}>{new Date(post.date).toLocaleDateString()}</small>
+            <h2 style={{ margin: "10px 0" }}>{post.title}</h2>
+            <p>Cliquez pour lire la suite...</p>
+          </a>
+        ))}
+        {posts.length === 0 && <p>Aucun article trouvé pour le moment.</p>}
+      </div>
     </div>
   );
 }
