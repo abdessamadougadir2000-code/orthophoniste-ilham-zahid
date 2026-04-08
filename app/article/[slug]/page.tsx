@@ -1,6 +1,7 @@
 "use client";
 
-export const dynamic = 'force-dynamic'; // السطر السحري اللي غايحل المشكل
+// السطر السحري اللي غايحل المشكل
+export const dynamic = 'force-dynamic'; 
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -55,8 +56,11 @@ export default function ArticlePage() {
   if (!article) return (
     <div style={{ textAlign: 'center', padding: '100px', fontFamily: 'sans-serif' }}>
       <h1 style={{ color: '#e53e3e' }}>⚠️ Article introuvable</h1>
-      <p>Désolé, nous ن'avons pas pu charger cet article.</p>
-      <button onClick={() => router.push('/blog')} style={{ background: '#0c6e5f', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer', marginTop: '20px' }}>
+      <p style={{ margin: "20px 0", color: "#666" }}>Désolé, nous n'avons pas pu charger cet article.</p>
+      <button 
+        onClick={() => router.push('/blog')} 
+        style={{ background: '#0c6e5f', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}
+      >
         Retour au Blog
       </button>
     </div>
@@ -75,8 +79,10 @@ export default function ArticlePage() {
         </button>
 
         <header style={{ marginTop: '40px' }}>
-          <h1 style={{ fontSize: "2.8rem", color: "#1a2332", marginBottom: "20px", lineHeight: "1.2" }}>{article.title}</h1>
-          <p style={{ color: "#718096" }}>Publié le {new Date(article._createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+          <h1 style={{ fontSize: "2.8rem", color: "#1a2332", marginBottom: "20px", lineHeight: "1.2", letterSpacing: "-0.02em" }}>{article.title}</h1>
+          <p style={{ color: "#718096" }}>
+            Publié le {new Date(article._createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </p>
         </header>
 
         {article.mainImage && (
