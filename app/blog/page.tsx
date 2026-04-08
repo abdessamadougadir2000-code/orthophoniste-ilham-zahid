@@ -1,65 +1,75 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { createClient } from "next-sanity";
+
+// إعدادات Sanity ديالك
+const client = createClient({
+  projectId: "77k3g7b4",
+  dataset: "production",
+  apiVersion: "2023-05-03",
+  useCdn: false,
+});
 
 export default function BlogPage() {
-  const blogHtml = String.raw`
-<!DOCTYPE html>
-<html lang="fr" dir="ltr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blog - Conseils en Orthophonie | Ilham Zahid</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  :root { --primary: #0c6e5f; --dark: #1a2332; --text: #2d3748; --bg: #f8fafb; }
-  body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); color: var(--text); }
-  .navbar { background: #fff; padding: 0 5%; height: 68px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top:0; z-index:100; }
-  .nav-brand { font-weight: 700; color: var(--dark); text-decoration: none; }
-  .container { max-width: 800px; margin: 60px auto; padding: 0 20px; }
-  .btn-back { color: var(--primary); text-decoration: none; font-weight: 600; display: inline-block; margin-bottom: 30px; }
-  h1 { font-size: 2.5rem; color: var(--dark); margin-bottom: 40px; }
-  
-  .article-link { text-decoration: none; color: inherit; display: block; margin-bottom: 25px; }
-  .card { background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); transition: transform 0.3s; }
-  .article-link:hover .card { transform: translateY(-5px); }
-  
-  .date { color: var(--primary); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
-  h2 { margin: 10px 0; font-size: 1.4rem; color: var(--dark); }
-  p { color: #64748b; line-height: 1.6; }
-</style>
-</head>
-<body>
-  <nav class="navbar">
-    <a href="/" class="nav-brand">Ilham Zahid — Orthophoniste</a>
-    <a href="/" style="text-decoration:none; color:var(--primary); font-weight:600;">Accueil</a>
-  </nav>
+  const [articles, setArticles] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  <div class="container">
-    <a href="/" class="btn-back">← Retour à l'accueil</a>
-    <h1>Articles & Conseils</h1>
+  useEffect(() => {
+    // كنجبدو المقالات الحقيقية من Sanity
+    const query = `*[_type == "article"] | order(_createdAt desc) {
+      title,
+      "slug": slug.current,
+      _createdAt,
+      "description": array::join(string::split(pt::text(body), "")[0..150], "") + "..."
+    }`;
 
-    <a href="/article/depistage-precoce" class="article-link">
-      <article class="card">
-        <span class="date">5 Avril 2026</span>
-        <h2>L'importance du dépistage précoce</h2>
-        <p>Découvrez pourquoi une intervention rapide peut faire toute la différence dans le développement du langage chez l'enfant...</p>
-      </article>
-    </a>
-
-    <a href="/article/conseils-begaiement" class="article-link">
-      <article class="card">
-        <span class="date">28 Mars 2026</span>
-        <h2>Conseils pour le bégaiement</h2>
-        <p>Comment accompagner son enfant au quotidien ? Voici quelques pistes pour favoriser une communication sereine à la maison.</p>
-      </article>
-    </a>
-  </div>
-</body>
-</html>
-  `;
+    client.fetch(query)
+      .then((data) => {
+        setArticles(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
 
   return (
-    <div dangerouslySetInnerHTML={{ __html: blogHtml }} />
+    <div style={{ fontFamily: "'Inter', sans-serif", background: "#f8fafb", minHeight: "100vh" }}>
+      {/* Navbar */}
+      <nav style={{ background: "#fff", padding: "0 5%", height: "68px", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 2px 10px rgba(0,0,0,0.05)", position: "sticky", top: 0, zIndex: 100 }}>
+        <a href="/" style={{ fontWeight: 700, color: "#1a2332", textDecoration: "none" }}>Ilham Zahid — Orthophoniste</a>
+        <a href="/" style={{ textDecoration: "none", color: "#0c6e5f", fontWeight: 600 }}>Accueil</a>
+      </nav>
+
+      <div style={{ maxWidth: "800px", margin: "60px auto", padding: "0 20px" }}>
+        <a href="/" style={{ color: "#0c6e5f", textDecoration: "none", fontWeiht: "600", display: "inline-block", marginBottom: "30px" }}>← Retour à l'accueil</a>
+        
+        <h1 style={{ fontSize: "2.5rem", color: "#1a2332", marginBottom: "40px" }}>Articles & Conseils</h1>
+
+        {loading ? (
+          <p>Chargement des articles...</p>
+        ) : (
+          <div>
+            {articles.map((article) => (
+              <a key={article.slug} href={`/article/${article.slug}`} style={{ textDecoration: "none", color: "inherit", display: "block", marginBottom: "25px" }}>
+                <article style={{ background: "#fff", padding: "30px", borderRadius: "15px", boxShadow: "0 4px 15px rgba(0,0,0,0.05)", borderLeft: "5px solid #0c6e5f" }}>
+                  <span style={{ color: "#0c6e5f", fontSize: "0.8rem", fontWeight: 700, textTransform: "uppercase" }}>
+                    {new Date(article._createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </span>
+                  <h2 style={{ margin: "10px 0", fontSize: "1.4rem", color: "#1a2332" }}>{article.title}</h2>
+                  <p style={{ color: "#64748b", lineHeight: "1.6" }}>{article.description}</p>
+                </article>
+              </a>
+            ))}
+
+            {articles.length === 0 && (
+              <p style={{ textAlign: "center", color: "#718096" }}>Aucun article trouvé dans Sanity.</p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
