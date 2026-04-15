@@ -1326,16 +1326,17 @@ img{max-width:100%;display:block;}
         </div>
       </div>
      <div class="map-container">
-  <iframe
-  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3441.2057917846066!2d-9.537233724335492!3d30.401202874744047!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xdb3c7b64d7880f9%3A0xe6754818c909a69e!2sCabinet%20d'orthophonie%20ZAHID%20ILHAM!5e0!3m2!1sfr!2sma!4v1713217274000!5m2!1sfr!2sma"
-  style="border:0; width:100%; height:100%; min-height:340px;"
-  allowfullscreen=""
-  loading="lazy"
-  referrerpolicy="no-referrer-when-downgrade"
-></iframe>
+  <iframe 
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3441.932973950669!2d-9.539828224434222!3d30.381335074756592!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xdb3c76008661fbd%3A0xc76d5418c909a69e!2sCabinet%20D&#39;orthophonie%20Zahid%20Ilham!5e0!3m2!1sfr!2sma!4v1744755106677!5m2!1sfr!2sma" 
+    width="100%" 
+    height="100%" 
+    style="border:0;" 
+    allowfullscreen="" 
+    loading="lazy" 
+    referrerpolicy="no-referrer-when-downgrade"
+    title="Localisation du Cabinet d'orthophonie Zahid Ilham">
+  </iframe>
 </div>
-    </div>
-  </div>
 </section>
 
 <a href="https://wa.me/212663036699?text=Bonjour%2C%20je%20souhaite%20prendre%20rendez-vous." class="whatsapp-float" target="_blank" rel="noopener" aria-label="Nous contacter sur WhatsApp">
